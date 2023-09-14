@@ -54,6 +54,9 @@ translated_pages = []
 folder_name = 'extraction_data'
 
 result_dict = {}
+document_result = {}
+result_append = {}
+final_result = {}
 
 for obj in s3.list_objects_v2(Bucket=bucket_name, Prefix=f"{folder_name}/").get("Contents", []):
         if obj["Size"] == 0:
@@ -61,7 +64,7 @@ for obj in s3.list_objects_v2(Bucket=bucket_name, Prefix=f"{folder_name}/").get(
         file_content = s3.get_object(Bucket=bucket_name, Key=obj['Key'])['Body'].read()
         pdf_reader = PdfReader(io.BytesIO(file_content))
         
-        document_result = {}
+
         
         for page_number, page in enumerate(pdf_reader.pages, start=1):
             page_text = page.extract_text()
@@ -70,22 +73,27 @@ for obj in s3.list_objects_v2(Bucket=bucket_name, Prefix=f"{folder_name}/").get(
             """
             result_text = get_completion(prompt, 8191)
             
+            document_result[f"Página {page_number}"] = result_text.strip()
             
-            for keyword in config.keywords:
-                if keyword not in document_result:
-                    document_result[keyword] = [] 
-                    if keyword in result_text:
-                        value = result_text.split(keyword, 1)[1].strip()
-                        document_result[keyword].append(value)
+        result_dict[obj['Key']] = document_result
+        
+        print(result_dict)    
+        for keyword in config.keywords:
+                if keyword in result_dict:
+                    value = result_text.split(keyword, 1)[1].strip()
+                    if value != None:
+                        result_append[keyword].append(value)
     
-    # Atualize o dicionário de resultados geral com os resultados deste documento
-for keyword, values in document_result.items():
-    if values:
-        result_dict[keyword] = values
+# Atualize o dicionário de resultados geral com os resultados deste documento
+        print(result_append)
+        for keyword, values in result_append.items():
+            if values:
+                final_result[keyword] = values
 
 # Converta o dicionário de resultados em JSON e imprima
-result_json = json.dumps(result_dict, indent=2)
+result_json = json.dumps(final_result, indent=2)
 print(result_json)
+
 
 
     
