@@ -1,0 +1,2 @@
+prompt_data = "quais são os valores que aparecem no texto de CNPJ, Endereço, Município, UF, Objeto da contratação, Prazo de validade do documento, Valor da multa, Data de assinatura, Nome, CPF das testemunhas e Cláusulas faltantes ou alteradas e organize pra mim em um Json, o texto é esse: "
+keywords = ["Razão social","CNPJ", "Endereço", "Município", "UF", "Objeto da contratação", "Prazo de validade do documento", "Valor da multa", "Data de assinatura", "Nome, CPF das testemunhas", "Cláusulas faltantes ou alteradas"]
